@@ -8,7 +8,7 @@ repos:
     rev: v0.15.7
     hooks:
       - id: ruff-format
-        args: [--fix]
+        types_or: [ python, pyi ]
       
       - id: ruff-check
         args: [--fix]
