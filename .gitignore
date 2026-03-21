@@ -9,6 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
+# ruff cache
+.ruff_cache/
 
 # environment variables
 .env
+
+# Db files
+*.sqlite3
