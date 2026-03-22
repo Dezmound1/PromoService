@@ -12,6 +12,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 5
 
   promo_service:
     container_name: promo_service
@@ -19,7 +23,8 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      [postgres]
+      postgres:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -29,6 +34,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - /app/.venv
 
 volumes:
   postgres_data:

@@ -15,5 +15,9 @@ wheels/
 # environment variables
 .env
 
-# Db files
+# Db files (my local tests, for more information see env.example and db settiong on django core)
 *.sqlite3
+
+# ide files (fuck jetbrains)
+.vscode/
+.idea/

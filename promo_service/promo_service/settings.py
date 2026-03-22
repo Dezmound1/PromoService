@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR.parent / ".env")
 
-IS_LOCAL = os.environ.get("IS_LOCAL")
+IS_LOCAL = int(os.environ.get("IS_LOCAL"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "goods",
+    "users",
+    "orders",
+    "promocode",
 ]
 
 MIDDLEWARE = [
@@ -77,15 +81,16 @@ WSGI_APPLICATION = "promo_service.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+
 DATABASES = (
     {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "postgres_db"),
-            "USER": os.environ.get("DB_USER", "postgres_user"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", "postgres_pwd"),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
+            "NAME": os.environ.get("DB_NAME"),
+            "USER": os.environ.get("DB_USER"),
+            "PASSWORD": os.environ.get("DB_PASSWORD"),
+            "HOST": os.environ.get("DB_HOST"),
+            "PORT": os.environ.get("DB_PORT"),
         }
     }
     if not IS_LOCAL

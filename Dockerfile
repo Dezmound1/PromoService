@@ -8,5 +8,6 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 RUN uv sync --locked
+RUN chmod +x ./entrypoint.sh
 
-CMD ["uv", "run", "promo_service/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["./entrypoint.sh"]
