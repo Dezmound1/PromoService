@@ -23,3 +23,4 @@ class Good(models.Model):
         blank=True,
         default=Status.ANOTHER,
     )
+    promo_eligible = models.BooleanField(default=True)

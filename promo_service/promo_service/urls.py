@@ -16,8 +16,21 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="PromoService API",
+        default_version="v1",
+        description="API для создания заказов с промокодами",
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("orders/", include("orders.urls")),
+    path("api_v1/", schema_view.with_ui(renderer="swagger"), name="swagger"),
 ]

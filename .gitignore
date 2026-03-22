@@ -21,3 +21,6 @@ wheels/
 # ide files (fuck jetbrains)
 .vscode/
 .idea/
+
+# json files
+*.json
