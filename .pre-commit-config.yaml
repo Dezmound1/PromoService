@@ -9,6 +9,15 @@ repos:
     hooks:
       - id: ruff-format
         types_or: [ python, pyi ]
-      
+
       - id: ruff-check
         args: [--fix]
+
+  - repo: local
+    hooks:
+      - id: pytest-cov
+        name: pytest coverage check (>=80%)
+        entry: uv run pytest promo_service/ --cov=promo_service --cov-fail-under=80 -q
+        language: system
+        pass_filenames: false
+        always_run: true

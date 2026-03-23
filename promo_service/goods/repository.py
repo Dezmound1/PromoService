@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from promo_service.goods.models import Good
+from goods.models import Good
 
 
 class GoodRepository:

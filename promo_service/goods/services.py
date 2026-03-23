@@ -1,4 +1,4 @@
-from promo_service.goods.repository import GoodRepository
+from goods.repository import GoodRepository
 
 
 class GoodService:

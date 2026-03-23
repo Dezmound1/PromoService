@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 
-from promo_service.users.repository import UserRepository
+from users.repository import UserRepository
 
 
 class UserService:

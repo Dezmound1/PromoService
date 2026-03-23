@@ -6,7 +6,7 @@ from goods.serializer import RequestGoodSerializer, ResponseGoodSerializer
 class CreateOrderSerializer(serializers.Serializer):
     """Serializer for creating an order."""
 
-    user_id = serializers.IntegerField(required=True, allow_empty=False)
+    user_id = serializers.IntegerField()
     goods = RequestGoodSerializer(many=True, required=True, allow_empty=False)
     promo_code = serializers.CharField(required=False, allow_null=True, default=None)
 

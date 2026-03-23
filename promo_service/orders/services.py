@@ -4,8 +4,8 @@ from rest_framework.exceptions import ValidationError
 
 from goods.repository import GoodRepository
 from orders.repository import OrderRepository
-from promo_service.goods.models import Good
-from promo_service.users.models import User
+from goods.models import Good
+from users.models import User
 from promocode.services import PromoCodeService
 
 
@@ -92,8 +92,6 @@ class OrderService:
             "order_id": order.id,
             "goods": goods_response,
             "price": total_price,
-            "discount": str(
-                promo.discount_percent / Decimal("100")
-            ),  # why str? why not int? strange contract
+            "discount": str(promo.discount_percent / Decimal("100")) if promo else "0",
             "total": order_total,
         }
