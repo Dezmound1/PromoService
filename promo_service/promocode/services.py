@@ -1,46 +1,94 @@
-from datetime import timezone
-from rest_framework.request import Request
+from decimal import Decimal
+
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
-from promo_service.promocode.repository import PromoCodeRepository
-from promo_service.users.repository import UserRepository
+from goods.models import Good
+from orders.repository import OrderRepository
+from promocode.models import DiscountPromoCode
+from promocode.repository import PromoCodeRepository
 
 
 class PromoCodeService:
-    """Service class for handling promo code related operations."""
+    """Service for validating and applying promo codes."""
 
-    def __init__(self, request: Request):
-        self.request = request.POST
-        self.promo_code_repository = PromoCodeRepository()
-        self.user_repository = UserRepository()
-        self.promo_code = self.promo_code_repository.get_promo_code(
-            self.request.get("promocode", "")
-        )
+    @staticmethod
+    def validate(code: str, user_id: int) -> DiscountPromoCode:
+        """
+        Validate a promo code against business rules.
 
-    def promocode_validation(self) -> bool:
-        """Validates the provided promo code."""
+        Parameters
+        ----------
+        code : str
+            The promo code string to validate.
+        user_id : int
+            The ID of the user attempting to use the promo code.
 
-        if not self.promo_code:
+        Returns
+        -------
+        DiscountPromoCode
+            The valid promo code instance.
+        """
+        promo = PromoCodeRepository.get_by_code(code)
+
+        if not promo:
+            raise ValidationError("Промокод не найден")
+
+        if not promo.is_active:
+            raise ValidationError("Промокод неактивен")
+
+        if promo.valid_until < timezone.now():
+            raise ValidationError("Промокод просрочен")
+
+        usage_count = OrderRepository.count_promo_usages(promo.id)
+        if usage_count >= promo.max_usages:
+            raise ValidationError("Лимит использований промокода исчерпан")
+
+        if OrderRepository.has_user_used_promocode(user_id, promo.id):
+            raise ValidationError("Вы уже использовали этот промокод")
+
+        return promo
+
+    @staticmethod
+    def is_discount_applicable(good: Good, promo: DiscountPromoCode) -> bool:
+        """
+        Check if a discount can be applied to a specific good.
+
+        Parameters
+        ----------
+        good : Good
+            The good instance to check.
+        promo : DiscountPromoCode
+            The promo code to apply.
+
+        Returns
+        -------
+        bool
+            True if the discount applies to this good.
+        """
+        if not good.promo_eligible:
             return False
 
-        if self.usage_limit_validation():
-            raise ValidationError("This promo code has reached its usage limit.")
-
-        if not self.expired_validation():
-            raise ValidationError("This promo code has expired.")
+        if promo.allowed_category and good.category != promo.allowed_category:
+            return False
 
         return True
 
-    def expired_validation(self) -> bool:
-        """Checks if the promo code has expired."""
-        return self.promo_code.valid_until < timezone.now()
+    @staticmethod
+    def calculate_discount(price: Decimal, promo: DiscountPromoCode) -> Decimal:
+        """
+        Calculate the discount amount for a given price.
 
-    def usage_limit_validation(self) -> bool:
-        """Checks if the promo code has remaining usages available."""
-        return self.promo_code.usages < 1
+        Parameters
+        ----------
+        price : Decimal
+            The original price.
+        promo : DiscountPromoCode
+            The promo code with discount percent.
 
-    def user_eligibility_validation(self) -> bool:
-        """Checks if the user is eligible to use the promo code."""
-        # user = self.user_repository.get_user(self.request.get("user_id", 0))
-
-        ...
+        Returns
+        -------
+        Decimal
+            The discount amount.
+        """
+        return price * promo.discount_percent / Decimal("100")

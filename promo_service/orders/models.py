@@ -2,6 +2,8 @@ from django.db import models
 
 
 class Order(models.Model):
+    """Model representing a customer order."""
+
     user = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="orders"
     )

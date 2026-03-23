@@ -1,10 +1,18 @@
-from promo_service.goods.models import Good
+from rest_framework import serializers
 
 
-class GoodSerializer:
-    """Serializer for the Good model."""
+class RequestGoodSerializer(serializers.Serializer):
+    """Serializer for good items in the order request."""
 
-    class Meta:
-        model = Good
-        fields = ["id", "name", "category", "price", "status"]
-        read_only_fields = fields
+    good_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+
+
+class ResponseGoodSerializer(serializers.Serializer):
+    """Serializer for good items in the order response."""
+
+    good_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount = serializers.DecimalField(max_digits=5, decimal_places=2)
+    total = serializers.DecimalField(max_digits=10, decimal_places=2)

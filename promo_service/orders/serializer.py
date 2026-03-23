@@ -1,29 +1,22 @@
 from rest_framework import serializers
 
-from promo_service.goods.serializer import GoodSerializer
-
-from .models import Order
-
-from promo_service.promocode.serializers import DiscountPromoCodeSerializer
+from goods.serializer import RequestGoodSerializer, ResponseGoodSerializer
 
 
 class CreateOrderSerializer(serializers.Serializer):
     """Serializer for creating an order."""
 
-    promo_code = DiscountPromoCodeSerializer()
-
-    class Meta:
-        model = Order
-        fields = ["user_id", "total_amount", "promo_code"]
+    user_id = serializers.IntegerField(required=True, allow_empty=False)
+    goods = RequestGoodSerializer(many=True, required=True, allow_empty=False)
+    promo_code = serializers.CharField(required=False, allow_null=True, default=None)
 
 
-class OrderResponseSerializer(serializers.ModelSerializer):
-    """Serializer for the Order model."""
+class OrderResponseSerializer(serializers.Serializer):
+    """Serializer for the order response."""
 
-    goods = GoodSerializer(many=True)  # TODO need to value fields of response
-    promo_code = DiscountPromoCodeSerializer()  # TODO need to value fields of response
-
-    class Meta:
-        model = Order
-        fields = ["id", "user", "goods", "promo_code", "total_price"]
-        read_only_fields = fields
+    user_id = serializers.IntegerField()
+    order_id = serializers.IntegerField()
+    goods = ResponseGoodSerializer(many=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount = serializers.DecimalField(max_digits=5, decimal_places=2)
+    total = serializers.DecimalField(max_digits=10, decimal_places=2)
