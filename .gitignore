@@ -14,6 +14,7 @@ wheels/
 
 # test coverage
 .coverage
+.pytest_cache/
 htmlcov/
 
 # environment variables
