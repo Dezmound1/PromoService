@@ -59,11 +59,11 @@ class OrderService:
             if promo and PromoCodeService.is_discount_applicable(good, promo):
                 item_discount = PromoCodeService.calculate_discount(
                     item_price, promo
-                )  # discount per good
+                )  # discount for all quantity of good
             else:
                 item_discount = Decimal("0")
 
-            item_total = item_price - (item_discount * quantity)
+            item_total = item_price - item_discount
             goods_response.append(
                 {
                     "good_id": good_id,

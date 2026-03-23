@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -91,4 +91,6 @@ class PromoCodeService:
         Decimal
             The discount amount.
         """
-        return price * promo.discount_percent / Decimal("100")
+        return (price * promo.discount_percent / Decimal("100")).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )

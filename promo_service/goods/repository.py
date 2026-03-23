@@ -7,7 +7,7 @@ class GoodRepository:
     """Repository class for accessing good data."""
 
     @staticmethod
-    def get_goods(goods_ids: list[int]) -> list[Good] | None:
+    def get_goods(goods_ids: list[int]) -> list[Good]:
         """Retrieves goods by their IDs."""
         return list(Good.objects.filter(id__in=goods_ids))
 
