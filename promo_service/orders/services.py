@@ -1,12 +1,13 @@
 from decimal import Decimal
 
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
+from goods.models import Good
 from goods.repository import GoodRepository
 from orders.repository import OrderRepository
-from goods.models import Good
-from users.models import User
 from promocode.services import PromoCodeService
+from users.models import User
 
 
 class OrderService:
@@ -80,12 +81,13 @@ class OrderService:
 
         order_total = total_price - total_discount
 
-        order = OrderRepository.create(
-            user=user,
-            goods=goods,
-            promo_code=promo,
-            total_price=order_total,
-        )
+        with transaction.atomic():
+            order = OrderRepository.create(
+                user=user,
+                goods=goods,
+                promo_code=promo,
+                total_price=order_total,
+            )
 
         return {
             "user_id": user.id,
