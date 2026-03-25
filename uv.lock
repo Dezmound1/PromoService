@@ -221,12 +221,16 @@ dependencies = [
     { name = "django" },
     { name = "djangorestframework" },
     { name = "drf-yasg" },
-    { name = "pre-commit" },
     { name = "psycopg2-binary" },
+    { name = "python-dotenv" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-django" },
-    { name = "python-dotenv" },
     { name = "ruff" },
 ]
 
@@ -235,12 +239,16 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.12" },
     { name = "djangorestframework", specifier = ">=3.17.0" },
     { name = "drf-yasg", specifier = ">=1.21.15" },
-    { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "pytest-django", specifier = ">=4.12.0" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "ruff", specifier = ">=0.15.7" },
 ]
 
