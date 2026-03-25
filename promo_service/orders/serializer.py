@@ -8,7 +8,9 @@ class CreateOrderSerializer(serializers.Serializer):
 
     user_id = serializers.IntegerField()
     goods = RequestGoodSerializer(many=True, required=True, allow_empty=False)
-    promo_code = serializers.CharField(required=False, allow_null=True, allow_blank=True, default=None)
+    promo_code = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, default=None
+    )
 
 
 class OrderResponseSerializer(serializers.Serializer):
