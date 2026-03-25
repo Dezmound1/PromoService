@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN uv sync --locked
+RUN uv sync --locked --no-dev
 RUN chmod +x ./entrypoint.sh
 
 CMD ["./entrypoint.sh"]
