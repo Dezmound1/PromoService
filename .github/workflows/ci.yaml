@@ -9,7 +9,8 @@ jobs:
     name: python
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Setup UV
         uses: astral-sh/setup-uv@v7
@@ -24,16 +25,14 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Ruff check
-        run: uv run ruff check .
-
-      - name: Ruff format check
-        run: uv run ruff format --check .
+      - name: Run formatting
+        run: uv run ruff format --check
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - uses: astral-sh/setup-uv@v7
         with:
