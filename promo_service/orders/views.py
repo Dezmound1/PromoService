@@ -1,3 +1,4 @@
+import structlog
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ValidationError
@@ -7,6 +8,8 @@ from rest_framework.response import Response
 from orders.serializer import CreateOrderSerializer, OrderResponseSerializer
 from orders.services import OrderService
 from users.repository import UserRepository
+
+logger = structlog.get_logger(__name__)
 
 
 class OrderViewSet(viewsets.ViewSet):
@@ -28,14 +31,25 @@ class OrderViewSet(viewsets.ViewSet):
         serializer = CreateOrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = UserRepository.get_user(serializer.validated_data["user_id"])
+        data = serializer.validated_data
+        user_id = data["user_id"]
+        log = logger.bind(user_id=user_id)
+
+        user = UserRepository.get_user(user_id)
         if not user:
+            log.warning("order.user_not_found")
             raise ValidationError("Пользователь не найден")
 
         result = OrderService.create_order(
             user=user,
-            goods_data=serializer.validated_data["goods"],
-            promo_code=serializer.validated_data.get("promo_code"),
+            goods_data=data["goods"],
+            promo_code=data.get("promo_code"),
+        )
+
+        log.info(
+            "order.created",
+            order_id=result["order_id"],
+            total=str(result["total"]),
         )
 
         response = OrderResponseSerializer(result)

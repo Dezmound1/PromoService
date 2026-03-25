@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import structlog
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
@@ -8,6 +9,8 @@ from goods.repository import GoodRepository
 from orders.repository import OrderRepository
 from promocode.services import PromoCodeService
 from users.models import User
+
+logger = structlog.get_logger(__name__)
 
 
 class OrderService:
@@ -34,11 +37,13 @@ class OrderService:
         dict
             Response data matching OrderResponseSerializer format.
         """
+        log = logger.bind(user_id=user.id, promo_code=promo_code)
 
         good_ids = [item["good_id"] for item in goods_data]
         goods = GoodRepository.get_goods(good_ids)
 
         if len(goods) != len(good_ids):
+            log.warning("order.goods_not_found", requested=good_ids)
             raise ValidationError("Один или несколько товаров не найдены")
 
         goods_map = {good.id: good for good in goods}
@@ -51,15 +56,11 @@ class OrderService:
         total_discount = Decimal("0")
 
         for good_id, quantity in quantity_map.items():
-            good: Good = goods_map[
-                good_id
-            ]  # marked type Good cos very hard to understand without it :(
+            good: Good = goods_map[good_id]
             item_price = good.price * quantity
 
             if promo and PromoCodeService.is_discount_applicable(good, promo):
-                item_discount = PromoCodeService.calculate_discount(
-                    item_price, promo
-                )  # discount for all quantity of good
+                item_discount = PromoCodeService.calculate_discount(item_price, promo)
             else:
                 item_discount = Decimal("0")
 
@@ -69,9 +70,7 @@ class OrderService:
                     "good_id": good_id,
                     "quantity": quantity,
                     "price": item_price,
-                    "discount": str(
-                        item_discount
-                    ),  # why str? why not int? strange contract
+                    "discount": str(item_discount),
                     "total": item_total,
                 }
             )
@@ -88,6 +87,15 @@ class OrderService:
                 promo_code=promo,
                 total_price=order_total,
             )
+
+        log.info(
+            "order.completed",
+            order_id=order.id,
+            total_price=str(total_price),
+            total_discount=str(total_discount),
+            order_total=str(order_total),
+            goods_count=len(goods),
+        )
 
         return {
             "user_id": user.id,
